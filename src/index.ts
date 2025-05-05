@@ -1,6 +1,7 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { createCanvas } from "canvas";
 
 // Define our MCP agent with tools
 export class MyMCP extends McpAgent {
@@ -60,6 +61,36 @@ export class MyMCP extends McpAgent {
 						break;
 				}
 				return { content: [{ type: "text", text: String(result) }] };
+			}
+		);
+
+		// Random base64 image tool
+		this.server.tool(
+			"randomBase64Image",
+			"Returns a randomly generated 128x128 JPEG image as a base64-encoded string.",
+			{},
+			async () => {
+				const size = 128;
+				const canvas = createCanvas(size, size);
+				const ctx = canvas.getContext("2d");
+				const imageData = ctx.createImageData(size, size);
+				for (let i = 0; i < imageData.data.length; i += 4) {
+					imageData.data[i] = Math.floor(Math.random() * 256);     // R
+					imageData.data[i + 1] = Math.floor(Math.random() * 256); // G
+					imageData.data[i + 2] = Math.floor(Math.random() * 256); // B
+					imageData.data[i + 3] = 255;                            // A
+				}
+				ctx.putImageData(imageData, 0, 0);
+				const base64 = canvas.toDataURL("image/jpeg").split(",")[1];
+				return {
+					content: [
+						{
+							type: "image",
+							data: base64,
+							mimeType: "image/jpeg",
+						},
+					],
+				};
 			}
 		);
 	}
