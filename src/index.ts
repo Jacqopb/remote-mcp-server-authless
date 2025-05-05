@@ -1,7 +1,7 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { createCanvas } from "canvas";
+import { createCanvas, ImageData } from "canvas";
 
 // Define our MCP agent with tools
 export class MyMCP extends McpAgent {
@@ -73,13 +73,14 @@ export class MyMCP extends McpAgent {
 				const size = 128;
 				const canvas = createCanvas(size, size);
 				const ctx = canvas.getContext("2d");
-				const imageData = ctx.createImageData(size, size);
-				for (let i = 0; i < imageData.data.length; i += 4) {
-					imageData.data[i] = Math.floor(Math.random() * 256);     // R
-					imageData.data[i + 1] = Math.floor(Math.random() * 256); // G
-					imageData.data[i + 2] = Math.floor(Math.random() * 256); // B
-					imageData.data[i + 3] = 255;                            // A
+				const data = new Uint8ClampedArray(size * size * 4);
+				for (let i = 0; i < data.length; i += 4) {
+					data[i] = Math.floor(Math.random() * 256);     // R
+					data[i + 1] = Math.floor(Math.random() * 256); // G
+					data[i + 2] = Math.floor(Math.random() * 256); // B
+					data[i + 3] = 255;                            // A
 				}
+				const imageData = new ImageData(data, size, size);
 				ctx.putImageData(imageData, 0, 0);
 				const base64 = canvas.toDataURL("image/jpeg").split(",")[1];
 				return {
