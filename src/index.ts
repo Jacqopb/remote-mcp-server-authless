@@ -13,7 +13,11 @@ export class MyMCP extends McpAgent {
 		// Simple addition tool
 		this.server.tool(
 			"add",
-			{ a: z.number(), b: z.number() },
+			"Adds two numbers together and returns the result.",
+			{
+				a: z.number().describe("The first number to add."),
+				b: z.number().describe("The second number to add."),
+			},
 			async ({ a, b }) => ({
 				content: [{ type: "text", text: String(a + b) }],
 			})
@@ -22,10 +26,13 @@ export class MyMCP extends McpAgent {
 		// Calculator tool with multiple operations
 		this.server.tool(
 			"calculate",
+			"Performs a calculation (add, subtract, multiply, divide) on two numbers.",
 			{
-				operation: z.enum(["add", "subtract", "multiply", "divide"]),
-				a: z.number(),
-				b: z.number(),
+				operation: z
+					.enum(["add", "subtract", "multiply", "divide"])
+					.describe("The operation to perform: add, subtract, multiply, or divide."),
+				a: z.number().describe("The first number for the operation."),
+				b: z.number().describe("The second number for the operation."),
 			},
 			async ({ operation, a, b }) => {
 				let result: number;
